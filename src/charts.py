@@ -3,23 +3,18 @@ import plotly as py
 import plotly.graph_objs as go
 import re
 
-from src.data.google_sheet import Gsheet
-from src.visualization.chart_layout import Layout, palette
+from chart_layout import Layout, palette
 
 # initialize plotly offline mode.
 py.offline.init_notebook_mode(connected=True)
-
-# initialise logging
-log = make_logger()
 
 
 class Visualize():
     """Generic tool for visualization in Jupyter Notebooks.
 
     This class allow users to generate great looking visualizations quickly.
-    It takes in data from CSV files, Google Sheets, BigQuery as sources,
-    converts it to pandas DataFrame, and build the visualization based on
-    prefix template.
+    It takes in data from CSV files as sources, converts it to DataFrame,
+    and build the visualization based on fixed template.
 
     Attributes:
         self.df (pd.DataFrame): raw data in DataFrame type.
@@ -30,7 +25,6 @@ class Visualize():
 
     def __init__(self, data):
 
-        self.project_id = "woven-bonbon-90705"  # set default GBQ project ID.
         self.df = self._to_dataframe(data)
 
         self.annotations = {}
