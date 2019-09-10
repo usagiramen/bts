@@ -22,15 +22,17 @@ PALETTE = [
 ]
 
 
-def palette(n=1, as_list=False, theme=PALETTE):
+def palette(n=1, theme=PALETTE):
     """Cycle through color palette and return a color."""
 
     color_length = len(theme)
 
-    if as_list:
-        return theme
+    if n > len(theme):
+        color = theme[n - color_length - 1]
+    else:
+        color = theme[n - 1]
 
-    return theme[n - color_length - 1] if n > len(theme) else theme[n - 1]
+    return color
 
 
 class Layout():
