@@ -11,8 +11,9 @@ FONT_SIZE = 16
 TITLE_SIZE = FONT_SIZE + 8
 
 # color pallete
-GREY_BACKGROUND = "#EFECEA"
-WHITE_BACKGROUND = "#FFFFFF"
+GREY = "#EFECEA"
+LIGHT_GREY = "#E5E2E0"
+WHITE = "#FFFFFF"
 DARK_TEXT = "#635F5D"
 LIGHT_TEXT = "#8E8883"
 
@@ -46,7 +47,17 @@ class Layout():
         self.y2label = y2label
 
     def _annotations(self):
-        """Build xlabel, ylabel, title using annotations."""
+        """Build xlabel, ylabel, title using annotations.
+        
+        The default x/y labels are muted, and replaced with annotations as it
+        provides better styles and customisation. All labels and titles are
+        calculated proportionate to the chart size.
+
+        Args:
+            None
+        Returns:
+            annotations (tuple): Fixed title, xlabel, and ylabel settings.
+        """
 
         y_tilt = 0  # y-label tilt.
         vertical_space = HEIGHT - MARGIN['t'] - MARGIN['b']
@@ -88,10 +99,13 @@ class Layout():
             showarrow=False,
         )
 
-        return (title, ylabel, xlabel)
+        annotations = (title, ylabel, xlabel)
+
+        return annotations
+
 
     def _canvas_white(self):
-        """Generate visualisation with white canvas, grey grid layout."""
+        """Build a white canvas with grey grid layout."""
 
         font_dict = dict(family=FONT_FAMILY)
 
@@ -100,16 +114,17 @@ class Layout():
             height=HEIGHT,
             font=font_dict,
             hoverlabel=dict(font=font_dict),
-            plot_bgcolor=WHITE_BACKGROUND,
-            paper_bgcolor=WHITE_BACKGROUND,
+            plot_bgcolor=WHITE,
+            paper_bgcolor=WHITE,
             margin=MARGIN,
             annotations=self._annotations()
         )
 
         return canvas_layout
 
+
     def _axis_no_titles(self, axis_args=None):
-        """Generate visualisation default axis layout."""
+        """Build the chart axes layout."""
 
         grid_width = 2
 
@@ -118,11 +133,11 @@ class Layout():
             ticklen=5,
             tickwidth=grid_width,
             showgrid=True,
-            gridcolor=WHITE_BACKGROUND,
+            gridcolor=WHITE,
             gridwidth=grid_width,
             zeroline=False,
             linewidth=6,
-            linecolor=GREY_BACKGROUND,
+            linecolor=GREY,
         )
 
         if axis_args is not None:
@@ -130,46 +145,44 @@ class Layout():
 
         return axis_layout
 
-    def _white_axis_no_titles(self, axis_args, **kwargs):
-        """Generate visualisation white axis layout."""
 
-        grid_width = 2
+    # def _white_axis_no_titles(self, axis_args, **kwargs):
+    #     """Generate visualisation white axis layout."""
 
-        axis_layout = dict(
-            tickfont=dict(size=FONT_SIZE),
-            ticklen=5,
-            tickwidth=grid_width,
-            showgrid=True,
-            gridcolor=GREY_BACKGROUND,
-            gridwidth=grid_width,
-            zeroline=False,
-            linewidth=6,
-            linecolor=WHITE_BACKGROUND,
-        )
+    #     grid_width = 2
 
-        if axis_args:
-            axis_layout.update(**axis_args)
+    #     axis_layout = dict(
+    #         tickfont=dict(size=FONT_SIZE),
+    #         ticklen=5,
+    #         tickwidth=grid_width,
+    #         showgrid=True,
+    #         gridcolor=GREY,
+    #         gridwidth=grid_width,
+    #         zeroline=False,
+    #         linewidth=6,
+    #         linecolor=WHITE,
+    #     )
 
-        # update other axis arguments.
-        axis_layout.update(**kwargs)
+    #     if axis_args:
+    #         axis_layout.update(**axis_args)
 
-        return axis_layout
+    #     # update other axis arguments.
+    #     axis_layout.update(**kwargs)
+
+    #     return axis_layout
 
     def _legend_grey(self):
-        """Generate visualisation default legend layout."""
-
-        legend_background = '#E5E2E0'
-        # legend_border = '#C0C0BB'
+        """Build legend layout."""
 
         legend = dict(
-            bgcolor=legend_background,
-            bordercolor=legend_background,
+            bgcolor=LIGHT_GREY,
+            bordercolor=LIGHT_GREY,
             borderwidth=1,
             font=dict(size=FONT_SIZE, color=DARK_TEXT),
             xanchor="left",
-            x=1.08,  # legend X position
             yanchor="bottom",
-            y=0.  # legend Y position
+            x=1.08,  # legend X position.
+            y=0.  # legend Y position.
         )
 
         return legend
@@ -190,35 +203,36 @@ class Layout():
 
         if "side" not in y2_args:
             y2_args['side'] = "right"
-        y2_args
+
         return y2_args
 
-    def default(self, axis_args=None, **kwargs):
-        """Generate default chart layout and style.
+    def one_axis_layout(self, axis_setting=None):
+        """Build layout and style for 1 y-axis chart.
 
         Args:
-            axis_args (dict): Arguments for x/y axes.
+            axis_setting (dict): Custom x/y-axis settings.
+        Return:
+            layout (dict):
         """
 
         canvas = self._canvas_white()
-        canvas.update(**kwargs)
+
+        x_axis = None
+        y_axis = None
 
         # separate x and y-axis arguments.
-        if axis_args is not None:
-            xaxis_args = axis_args['x'] if 'x' in axis_args.keys() else None
-            yaxis_args = axis_args['y'] if 'y' in axis_args.keys() else None
-        else:
-            xaxis_args = None
-            yaxis_args = None
+        if axis_setting is not None:
+            x_axis = axis_setting["x"] if "x" in axis_setting.keys() else None
+            y_axis = axis_setting["y"] if "y" in axis_setting.keys() else None
 
-        default_layout = go.Layout(
-            xaxis=self._axis_no_titles(xaxis_args),
-            yaxis=self._axis_no_titles(yaxis_args),
+        layout = go.Layout(
+            xaxis=self._axis_no_titles(x_axis),
+            yaxis=self._axis_no_titles(y_axis),
             legend=self._legend_grey(),
-            **canvas
+            **canvas  # canvas-related settings.
         )
 
-        return default_layout
+        return layout
 
     def two_y_axes(self, axis_args, **kwargs):
         """Generate chart layout with two y-axis.
@@ -228,7 +242,6 @@ class Layout():
         """
 
         canvas = self._canvas_white()
-        canvas.update(**kwargs)
 
         # include necessary arguments for y2-axis.
         y2_args = self._format_to_y2(axis_args['y2'])
@@ -243,22 +256,22 @@ class Layout():
 
         return axis_layout
 
-    def two_columns_subplot(self, axis_args, **kwargs):
-        """Generate chart layout with side-by-side subplots.
+    # def two_columns_subplot(self, axis_args, **kwargs):
+    #     """Generate chart layout with side-by-side subplots.
 
-        Args:
-            axis_args (dict): Arguments for x/y axes.
-        """
+    #     Args:
+    #         axis_args (dict): Arguments for x/y axes.
+    #     """
 
-        canvas = self._canvas_white()
-        canvas.update(**kwargs)
+    #     canvas = self._canvas_white()
+    #     canvas.update(**kwargs)
 
-        subplot_layout = go.Layout(
-            xaxis=self._white_axis_no_titles(axis_args['x'], domain=[0, .4]),
-            yaxis=self._white_axis_no_titles(axis_args['y']),
-            xaxis2=self._white_axis_no_titles(axis_args['x'], domain=[.5, .9]),
-            yaxis2=self._white_axis_no_titles(axis_args['x'], anchor='x2'),
-            **canvas
-        )
+    #     subplot_layout = go.Layout(
+    #         xaxis=self._white_axis_no_titles(axis_args['x'], domain=[0, .4]),
+    #         yaxis=self._white_axis_no_titles(axis_args['y']),
+    #         xaxis2=self._white_axis_no_titles(axis_args['x'], domain=[.5, .9]),
+    #         yaxis2=self._white_axis_no_titles(axis_args['x'], anchor='x2'),
+    #         **canvas
+    #     )
 
-        return subplot_layout
+    #     return subplot_layout
