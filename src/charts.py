@@ -39,24 +39,14 @@ class Visualize():
             raw (pd.DataFrame): Dataset in DataFrame type.
         """
 
+        # if data is already a DataFrame, do nothing.
         if isinstance(raw, pd.DataFrame):
             return raw
 
-        if isinstance(raw, str):
-            raw_string = raw.replace('\n', ' ')
-            print(raw_string)
-            if re.match(r'(|.+)SELECT.+FROM.+', raw_string):
-                return self._process_bigquery(raw_string)
+        output = pd.read_csv(raw)
 
-            if re.match(r'https://docs.google.com\/spreadsheets', raw_string):
-                return self._process_gsheet(raw_string)
+        return output
 
-            if raw_string[-4:] == '.csv':
-                return pd.read_csv(raw_string)
-
-        # unknown data type.
-        log.error("Unknown data type. Please ping weijian.")
-        return None
 
     def _format_labels(self, column_name, label=None):
         """Format x and y labels.
@@ -175,16 +165,16 @@ class Visualize():
         self, x, y, title, stack=False, horizontal=False,
         x_range=None, y_range=None, xlabel=None, ylabel=None
     ):
-        """Generate bar chart.
+        """Build a bar chart.
 
         Args:
-            x (str): X-axis column, a.k.a dimension.
-            y (str/list): Y-axis column, a.k.a measures.
+            x (str): X-axis column name.
+            y (str/list): Y-axis column name.
             title (str): Chart title.
-            xlabel (str): Label for x-axis (optional).
-            ylabel (str): Label for y-axis (optional).
             stack (bool): Convert to stacked bar chart.
             horizontal (bool): Convert to horizontal chart.
+            xlabel (str): Label for x-axis (optional).
+            ylabel (str): Label for y-axis (optional).
         Returns:
             status (bool): Visualization success.
         """
