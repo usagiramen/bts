@@ -1,3 +1,8 @@
+"""Chart Layouts."""
+
+import os
+import json
+
 import numpy as np
 import plotly.graph_objs as go
 
@@ -39,13 +44,16 @@ def palette(n=1, theme=PALETTE):
 class Layout():
     """Set of default parameteres for the chart layout."""
 
-    def __init__(self, chart_title, xlabel, ylabel, y2label=None):
+    def __init__(
+        self, title, xlabel, ylabel, y2label=None, theme="default.json"
+    ):
 
-        self.title = chart_title
+        self.title = title
         self.xlabel = xlabel
         self.ylabel = ylabel
         self.y2label = y2label
 
+    
     def _annotations(self):
         """Build xlabel, ylabel, title using annotations.
         
@@ -275,3 +283,52 @@ class Layout():
     #     )
 
     #     return subplot_layout
+
+
+class Theme():
+    """Reads layout settings from JSON file."""
+
+    def __init__(self, json_path):
+        self.settings = self._json_input(json_path)
+        self.height = self.settings["height"]
+        self.width = self._set_width()
+
+    
+    def _json_input(self, file):
+        
+        # TO-DO: check file format.
+
+        json_path = os.path.join(os.getcwd(), "src", "themes", file)
+
+        with open(json_path) as file:
+            settings = json.load(file)
+
+            return settings
+
+        return False
+
+
+    def _set_width(self):
+        """Determine chart width.
+
+        If width was not specified (or 0) in the JSON file, set the width
+        according to the golden ratio calculation.
+
+        Args:
+            width (int): Chart width specified in the JSON file.
+        Returns:
+            width (int): Correct chart width.
+        """
+
+        width = self.settings["height"] * (1.5 + np.sqrt(5)) / 2
+
+
+        if "width" in self.settings and self.settings["width"] > 0:
+            # use the width in JSON file instead.
+            width = self.settings["width"]
+
+        return width
+
+
+
+Theme("default.json")

@@ -1,0 +1,34 @@
+{
+    "height": 500,
+    "width": 1,
+    "background_color": "#FFFFFF",
+    "margin": {
+        "left": 80,
+        "right": 80,
+        "top": 100,
+        "bottom": 80
+    },
+    "text": {
+        "font_family": "Trebuchet MS",
+        "size": 16
+    },
+    "title": {
+        "size": 24
+    },
+    "axis": {
+        "tick_length": 5,
+        "tick_width": 2,
+        "grid_color": "#FFFFFF",
+        "line_width": 6,
+        "line_color": "#EFECEA"
+    },
+    "legend": {
+        "color": "#E5E2E0",
+        "border_color": "#E5E2E0",
+        "border_width": 1,
+        "x_anchor": "left",
+        "y_anchor": "bottom",
+        "x": 1.08,
+        "y": 0.0 
+    }
+}
